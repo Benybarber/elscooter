@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VHDeS</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main>
+        <h1>Välkommen till Vi Hyr Dig en elScooter!</h1>
+    </main>
+    <section id="ruta1">
+        <h1>Logga in</h1>
+        <form id="myForm">
+                <label for="namn">Användarnamn:</label>
+                <br>
+                <input type="text" id="namn" name="mail">
+                <br>
+                <label for="lösen">Lösenord:</label>
+                <br>
+                <input type="password" id="lösen" name="lösen">
+                <br>
+                <input type="submit" value="Submit">
+            </form>
+            <a href="Skapa.html">Skapa konto:</a>
+        </section>
+<footer>
+    <p>All rights reserved</p>
+</footer>
+<script>
+const form = document.getElementById('myForm');
+
+form.addEventListener('submit', function (event){
+    event.preventDefault();
+
+    const namn = document.getElementById('namn').value;
+    const lösen = document.getElementById('lösen').value;
+
+    // Hämta sparade kontouppgifter
+    const sparatNamn = localStorage.getItem("kontoNamn");
+    const sparatLösen = localStorage.getItem("kontoLösen");
+
+    if(namn === sparatNamn && lösen === sparatLösen){
+        window.location.href = `uthyrning.html?namn=${encodeURIComponent(namn)}`;
+    } else {
+        alert("Fel användarnamn eller lösenord!");
+    }
+});
+
+    </script>
+</body>
+</html>

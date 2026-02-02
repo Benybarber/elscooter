@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign up</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main>
+        <h1>Skapa ett Konto!</h1>
+    </main>
+    <section id="ruta1">
+        <h1>Logga in</h1>
+        <form id="myForm">
+                <label for="namn">Användarnamn:</label>
+                <br>
+                <input type="text" id="namn" name="mail">
+                <br>
+                <label for="lösen">Lösenord:</label>
+                <br>
+                <input type="password" id="lösen" name="lösen">
+                <br>
+                <input type="submit" value="Skapa konto">
+            </form>
+           
+        </section>
+<footer>
+    <p>All rights reserved</p>
+</footer>
+<script>
+        const form = document.getElementById('myForm');
+        form.addEventListener('submit', function (event){
+             event.preventDefault(); 
+             const namn = document.getElementById('namn').value; 
+             const lösen = document.getElementById('lösen').value; 
+             
+             if(namn === "" || lösen === "")
+             { alert("Du måste fylla i alla fält!");
+              return; }  
+              localStorage.setItem("kontoNamn", namn); 
+              localStorage.setItem("kontoLösen", lösen); 
+              alert("Konto skapat!");  
+              window.location.href = "uthyrning.html";  });
+    </script>
+</body>
+</html>
