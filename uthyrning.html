@@ -1,12 +1,197 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sv">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VHDeS - Hyr</title>
+    <title>VHDeS - Profil</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Hej</h1>
-    <a href="loggain.html"> logga ut</a>
+
+<h1 id="välkomstText"></h1>
+
+<div id="profilRuta">
+    <div id="prislista">
+        <h3>Priser</h3>
+        <p>Startavgift: 10 kr</p>
+        <p>2 kr per minut</p>
+    </div>
+
+    <button id="hyrKnapp">Hyr elscooter</button>
+    <button id="lämnaKnapp" style="display:none;">Avsluta uthyrning</button>
+
+    <p id="timer"></p>
+
+    <button id="historikKnapp">Visa historik</button>
+    <div id="historik" style="display:none;"></div>
+
+    <div id="info"></div>
+</div>
+
+<a href="loggain.html">Logga ut</a>
+
+<script>
+const användare = localStorage.getItem("inloggadAnvändare");
+
+if(localStorage.getItem("hyrData_" + användare)) {
+    try {
+        const test = JSON.parse(localStorage.getItem("hyrData_" + användare));
+        if(!Array.isArray(test) || (test.length && !test[0].datum)) {
+            // om strukturen inte matchar, rensa
+            localStorage.removeItem("hyrData_" + användare);
+        }
+    } catch(e) {
+        localStorage.removeItem("hyrData_" + användare);
+    }
+}
+
+// Om ingen är inloggad, skicka tillbaka till login
+if(!användare){
+    window.location.href = "loggain.html";
+}
+
+const välkomstText = document.getElementById("välkomstText");
+const hyrKnapp = document.getElementById("hyrKnapp");
+const lämnaKnapp = document.getElementById("lämnaKnapp");
+const info = document.getElementById("info");
+const timerText = document.getElementById("timer");
+const historikKnapp = document.getElementById("historikKnapp");
+const historikDiv = document.getElementById("historik");
+
+välkomstText.textContent = "Välkommen " + användare + "!";
+
+const STARTAVGIFT = 10;
+const PRIS_PER_MINUT = 2;
+
+let hyrHistorik = JSON.parse(localStorage.getItem("hyrData_" + användare)) || [];
+let startTid = null;
+let timerInterval = null;
+
+// =====================
+// Om det redan finns en aktiv hyrning
+// =====================
+const sparadStart = localStorage.getItem("aktivHyr_" + användare);
+if(sparadStart){
+    startTid = Number(sparadStart);
+    visaHyrStatus();
+    startTimer();
+}
+
+// =====================
+// Starta hyrning
+// =====================
+hyrKnapp.addEventListener("click", function(){
+    if(startTid !== null) return;
+
+    startTid = Date.now();
+    localStorage.setItem("aktivHyr_" + användare, startTid);
+
+    visaHyrStatus();
+    startTimer();
+});
+
+// =====================
+// Avsluta hyrning
+// =====================
+lämnaKnapp.addEventListener("click", function(){
+    if(startTid === null) return;
+
+    clearInterval(timerInterval);
+
+    const slutTid = Date.now();
+    const totaltSekunder = Math.floor((slutTid - startTid) / 1000);
+
+    const minuter = Math.floor(totaltSekunder / 60);
+    const sekunder = totaltSekunder % 60;
+
+    const pris = STARTAVGIFT + (minuter * PRIS_PER_MINUT);
+    const datum = new Date().toLocaleString();
+
+    const hyrning = {
+        datum: datum,
+        minuter: minuter,
+        sekunder: sekunder,
+        pris: pris
+    };
+
+    hyrHistorik.push(hyrning);
+    localStorage.setItem("hyrData_" + användare, JSON.stringify(hyrHistorik));
+
+    // Rensa aktiv hyrning
+    localStorage.removeItem("aktivHyr_" + användare);
+    startTid = null;
+
+    // Återställ knappar
+    hyrKnapp.classList.remove("hyrd");
+    hyrKnapp.disabled = false;
+    hyrKnapp.style.display = "inline";
+    lämnaKnapp.style.display = "none";
+
+    timerText.textContent = "";
+
+    info.innerHTML = `
+        <p>Du hyrde i ${minuter} min ${sekunder} sek</p>
+        <p>Pris: ${pris} kr</p>
+    `;
+});
+
+// =====================
+// Timer
+// =====================
+function startTimer(){
+    timerInterval = setInterval(function(){
+        const nu = Date.now();
+        const tidISekunder = Math.floor((nu - startTid) / 1000);
+
+        const minuter = Math.floor(tidISekunder / 60);
+        const sekunder = tidISekunder % 60;
+
+        timerText.textContent = `Tid: ${minuter} min ${sekunder} sek`;
+    }, 1000);
+}
+
+// =====================
+// Visa hyrstatus (CSS)
+function visaHyrStatus(){
+    hyrKnapp.classList.add("hyrd");
+    hyrKnapp.disabled = true;
+    hyrKnapp.style.display = "none";
+    lämnaKnapp.style.display = "inline";
+}
+
+// =====================
+// Visa/Dölj historik
+historikKnapp.addEventListener("click", function(){
+    if(historikDiv.style.display === "none"){
+        historikDiv.style.display = "block";
+        historikKnapp.textContent = "Dölj historik";
+        visaHistorik();
+    } else {
+        historikDiv.style.display = "none";
+        historikKnapp.textContent = "Visa historik";
+    }
+});
+
+function visaHistorik(){
+    historikDiv.innerHTML = "<h3>Tidigare uthyrningar:</h3>";
+
+    if(hyrHistorik.length === 0){
+        historikDiv.innerHTML += "<p>Ingen historik ännu.</p>";
+        return;
+    }
+
+    hyrHistorik.forEach(function(hyrning, index){
+        historikDiv.innerHTML += `
+            <p>
+            ${index + 1}.<br>
+            Datum: ${hyrning.datum}<br>
+            Tid: ${hyrning.minuter} min ${hyrning.sekunder} sek<br>
+            Pris: ${hyrning.pris} kr
+            </p>
+        `;
+    });
+}
+</script>
+
 </body>
 </html>

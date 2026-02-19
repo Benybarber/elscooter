@@ -15,15 +15,15 @@
         <form id="myForm">
                 <label for="namn">Användarnamn:</label>
                 <br>
-                <input type="text" id="namn" name="mail">
+                <input type="text" id="namn" >
                 <br>
                 <label for="lösen">Lösenord:</label>
                 <br>
-                <input type="password" id="lösen" name="lösen">
+                <input type="password" id="lösen" >
                 <br>
                 <input type="submit" value="Logga in!">
             </form>
-            <a href="Skapa.html">Skapa konto:</a>
+            <a href="skapa.html">Skapa konto:</a>
         </section>
 <footer>
     <p>All rights reserved</p>
@@ -41,10 +41,9 @@ form.addEventListener('submit', function (event){
     const sparatNamn = localStorage.getItem("kontoNamn");
     const sparatLösen = localStorage.getItem("kontoLösen");
 
-    if(namn === sparatNamn && lösen === sparatLösen){
-        window.location.href = `uthyrning.html?namn=${encodeURIComponent(namn)}`;
-    } else {
-        alert("Fel användarnamn eller lösenord!");
+     if(namn === sparatNamn && lösen === sparatLösen){
+        localStorage.setItem("inloggadAnvändare", namn);
+        window.location.href = "uthyrning.html";
     }
 });
 

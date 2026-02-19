@@ -11,15 +11,15 @@
         <h1>Skapa ett Konto!</h1>
     </main>
     <section id="ruta1">
-        <h1>Logga in</h1>
+        <h1>Skapa konto</h1>
         <form id="myForm">
                 <label for="namn">Användarnamn:</label>
                 <br>
-                <input type="text" id="namn" name="mail">
+                <input type="text" id="namn" >
                 <br>
                 <label for="lösen">Lösenord:</label>
                 <br>
-                <input type="password" id="lösen" name="lösen">
+                <input type="password" id="lösen" >
                 <br>
                 <input type="submit" value="Skapa konto!">
             </form>
@@ -40,8 +40,9 @@
               return; }  
               localStorage.setItem("kontoNamn", namn); 
               localStorage.setItem("kontoLösen", lösen); 
-              alert("Konto skapat!");  
-              window.location.href = "uthyrning.html";  });
+              
+              
+              window.location.href = "loggain.html";  });
     </script>
 </body>
 </html>
